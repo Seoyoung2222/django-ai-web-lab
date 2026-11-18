@@ -1,6 +1,6 @@
 # Korean Sentiment Analysis
 
-Django 화면에서 한국어 문장을 입력하고 KoBERT 기반 이진 분류 모델로 부정/긍정 결과를 표시하도록 구성한 프로젝트입니다. **모델 가중치와 데이터가 별도로 필요하며, 이 저장소에서 실제 추론까지 검증된 상태는 아닙니다.**
+Django 화면에서 한국어 문장을 입력하고 KoBERT 기반 이진 분류 모델로 부정/긍정 결과를 표시하도록 구성한 프로젝트입니다. 모델 가중치와 데이터가 별도로 필요합니다. 실제 모델 로딩과 end-to-end 추론은 검증되지 않았습니다.
 
 ## 코드에 구현된 흐름
 
@@ -20,7 +20,7 @@ Django 화면에서 한국어 문장을 입력하고 KoBERT 기반 이진 분류
 
 | 파일 | 역할 |
 |---|---|
-| `main/bert_tokenizer.py` | SentencePiece 기반 KoBERT tokenizer, 원저작권/Apache 2.0 고지 유지 |
+| `main/bert_tokenizer.py` | SentencePiece 기반 KoBERT tokenizer, Apache 2.0 라이선스 고지 포함 |
 | `main/bert_load.py` | 기본 모델과 tokenizer 로딩, 분류 head 구성, H5 가중치 로딩 |
 | `main/inference_bert.py` | 전처리, 토큰화, 추론 결과 문자열 |
 | `main/views.py` | 데이터 미리보기와 HTTP 입력/결과 |
@@ -35,11 +35,11 @@ korean-sentiment-analysis/
 └── models/best_kobert_weights.h5
 ```
 
-원본 ZIP에는 두 파일이 있지만, 가중치가 약 369 MB이고 리뷰 데이터의 재배포 권한을 확인하지 않아 Git 커밋에서는 제외했습니다. `.gitignore`도 두 경로의 데이터와 가중치를 제외합니다. 사용 권한을 확인한 원본을 위 경로에 별도로 배치해야 합니다. 잘못된 가중치로 대체하거나 빈 파일을 만들면 실행되지 않습니다.
+두 파일은 저장소에 포함되어 있지 않습니다. 분류 head와 호환되는 학습 가중치 및 사용 권한이 있는 리뷰 데이터를 위 경로에 배치해야 합니다. `.gitignore`에서 데이터와 모델 파일을 제외하고 있습니다.
 
-## 의존성과 실행 준비
+## 실행 준비
 
-공통 `requirements.txt` 외에 코드상 `pandas`, `tensorflow`, `transformers`(TFBertModel 지원 버전), `sentencepiece`, `torch`가 필요합니다. `from_pt=True` 변환에는 PyTorch가 사용됩니다. 원본 공통 requirements에는 이 ML 환경 버전이 빠져 있어 TensorFlow/Keras/Transformers 간 호환되는 정확한 조합은 확정하지 않았습니다. 환경 구축 시 별도 가상환경을 권장합니다.
+공통 `requirements.txt` 외에 코드상 `pandas`, `tensorflow`, `transformers`(TFBertModel 지원 버전), `sentencepiece`, `torch`가 필요합니다. `from_pt=True` 변환에는 PyTorch가 사용됩니다. 공통 requirements에는 ML 의존성이 포함되어 있지 않으며 TensorFlow/Keras/Transformers 간 호환 버전 조합은 확정하지 않았습니다. 환경 구축 시 별도 가상환경을 권장합니다.
 
 준비 순서:
 1. TensorFlow와 해당 KoBERT 코드가 호환되는 Python/ML 패키지 조합을 구성합니다.
@@ -49,15 +49,11 @@ korean-sentiment-analysis/
 5. `python manage.py runserver 8000`으로 시작하고 `/predict_sentiment/bert_input/`을 엽니다.
 6. 입력 문장을 `target_sentence` 필드로 `/predict_sentiment/bert_predict/`에 POST합니다.
 
-## 저장소 정리 시 수정
-
-원본 view에서 호출하던 `bert_load`의 import가 빠져 있어 `from . import inference_bert, bert_load`로 보완했습니다. 고정 SECRET_KEY를 제거하고 로컬 호스트와 DEBUG를 환경변수로 설정하도록 정리했습니다. 모델 구조나 예측 로직은 바꾸지 않았습니다.
-
 ## 알려진 한계
 
 - 요청할 때마다 tokenizer와 모델을 로드합니다. 모델 캐싱이나 비동기 추론은 없습니다.
 - 데이터 미리보기도 요청마다 전체 파일을 읽습니다.
 - 빈 입력/GET 요청, 모델/데이터 누락에 대한 사용자 오류 화면은 없습니다.
-- 원본 tokenizer가 사용하는 API 및 다운로드 주소의 현재 호환성은 별도 확인이 필요합니다.
+- tokenizer가 사용하는 API와 다운로드 주소의 현재 호환성은 별도 확인이 필요합니다.
 - 데이터 전처리 코드만으로 모델 학습 방법, 데이터 분할, 정확도 등의 실험 결과를 증명할 수 없습니다.
-- 실제 모델 다운로드, 대용량 가중치 로딩, end-to-end 추론은 이번 정리에서 실행하지 않았습니다.
+- 실제 모델 다운로드, 가중치 로딩, end-to-end 추론은 검증되지 않았습니다.

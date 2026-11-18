@@ -42,7 +42,7 @@ python manage.py createsuperuser
 python manage.py runserver 8000
 ```
 
-`/admin/`에서 Question과 Choice를 만든 뒤 `/polls/`에서 투표합니다. 원본 DB를 제외했기 때문에 최초 목록은 비어 있습니다.
+`/admin/`에서 Question과 Choice를 만든 뒤 `/polls/`에서 투표합니다. 초기 데이터가 없으므로 첫 실행 시 목록은 비어 있습니다.
 
 ## 제약과 개선 지점
 
@@ -50,4 +50,4 @@ python manage.py runserver 8000
 - `votes += 1` 후 저장하는 방식이라 동시 요청 시 갱신 손실 가능성이 있습니다. 원자적 `F()` 갱신은 아직 구현하지 않았습니다.
 - 미래 게시일 질문도 목록에 포함될 수 있습니다.
 - 투표 예외 처리가 광범위한 `except`로 되어 있으며 POST 전용 데코레이터는 없습니다.
-- 기존 `tests.py`에는 실제 테스트가 없습니다. 저장소 정리 시 수행한 별도 점검은 루트 검증 문서에 기록합니다.
+- `tests.py`에는 자동화된 테스트가 구현되어 있지 않습니다.

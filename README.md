@@ -1,35 +1,74 @@
 # Django AI Web Lab
 
-Django의 폼, ORM, 템플릿 기반 웹 개발에서 이미지 처리와 한국어 감성 분석까지 연결한 네 개의 독립 웹 프로젝트입니다. 원본 ZIP에 누적된 동일 프로젝트는 한 번씩만 정리하고, 실제 기능에 맞춰 폴더 이름을 지정했습니다.
+**웹 애플리케이션에 데이터 처리와 AI 추론을 연결한 Django 프로젝트 모음**
 
-## 프로젝트 한눈에 보기
+사용자 입력을 받아 데이터를 저장하는 웹 서비스부터 이미지 검출, 한국어 감성 분석까지 구현한 네 개의 프로젝트입니다. Django의 URL 라우팅, 폼 검증, ORM, 템플릿을 공통 기반으로 사용하며 각 프로젝트는 독립적으로 실행됩니다.
 
-| 프로젝트 | 핵심 구현 | 접속 경로 | 상세 설명 |
-|---|---|---|---|
-| 랜덤 번호 생성 | 1~45 사이 중복 없는 숫자 6개를 기본 5세트 생성하고 저장 | `/lotto/` | [random-number-generator](random-number-generator/README.md) |
-| 질문과 투표 | 질문 목록, 선택지 투표, 득표 결과, 관리자 화면 | `/polls/` | [polling-app](polling-app/README.md) |
-| 얼굴과 눈 검출 | 이미지 업로드, Haar Cascade 검출, 검출 영역 표시 | `/detect_face/` | [face-eye-detection](face-eye-detection/README.md) |
-| 한국어 감성 분석 | KoBERT 기반 이진 감성 분류 모델 구성과 추론 흐름 | `/predict_sentiment/bert_input/` | [korean-sentiment-analysis](korean-sentiment-analysis/README.md) |
+## 프로젝트
 
-각 폴더에 별도의 `manage.py`, 설정 모듈, SQLite DB가 있습니다. 하나의 서버에서 네 앱이 함께 실행되는 구조는 아닙니다. 폴더 이름은 기능 중심으로 바꾸고 Django 내부 패키지 이름(`site_1`, `site_2`, `cv_project`, `bert_project`)은 import 호환성을 위해 유지했습니다.
+| 프로젝트 | 주요 기능 | 구현 기술 |
+|---|---|---|
+| [Random Number Generator](random-number-generator/README.md) | 랜덤 번호 생성, 결과 저장, 목록 및 상세 조회 | ModelForm, ORM, SQLite |
+| [Polling App](polling-app/README.md) | 질문별 투표, 득표 결과, 관리자 검색과 필터 | 관계형 모델, POST 처리, Django Admin |
+| [Face & Eye Detection](face-eye-detection/README.md) | 이미지 업로드, 얼굴과 눈 검출, 결과 이미지 표시 | ImageField, OpenCV, Haar Cascade |
+| [Korean Sentiment Analysis](korean-sentiment-analysis/README.md) | 리뷰 데이터 미리보기, 한국어 문장 전처리, 감성 분류 추론 코드 | pandas, KoBERT, TensorFlow, SentencePiece |
 
-## 구조
+## 기술 구성
+
+- **Backend:** Python, Django
+- **Data:** SQLite, Django ORM, pandas, NumPy
+- **Computer Vision:** OpenCV Haar Cascade
+- **NLP:** KoBERT, Hugging Face Transformers, TensorFlow/Keras, SentencePiece
+- **Frontend:** Django Templates, HTML, CSS
+
+## 구현 구조
+
+```text
+브라우저 → URL 라우팅 → View → Form / Model / 처리 함수 → Template → 응답
+                                   ↓
+                       프로젝트별 데이터베이스 또는 파일
+```
+
+### 입력부터 저장까지
+
+번호 생성 앱은 ModelForm으로 제목과 설명을 검증한 후 모델 메서드에서 번호와 생성 시각을 저장합니다. 투표 앱은 Question과 Choice의 일대다 관계를 이용해 질문별 선택지와 득표 수를 관리합니다.
+
+### 이미지 처리와 웹 화면 연결
+
+이미지 검출 앱은 ImageField에 저장한 파일을 OpenCV로 읽습니다. 얼굴 영역과 해당 영역 안의 눈을 검출하고, 검출 위치를 표시한 이미지를 웹 화면에 반환합니다.
+
+### 한국어 텍스트의 추론 흐름
+
+감성 분석 앱은 문장 전처리, 토큰화, 길이 조정, 모델 입력 배열 구성, 분류 결과 표시로 이어지는 흐름을 구성합니다. KoBERT 출력에 이진 분류 head를 연결하며 별도 학습 가중치가 필요합니다. 실제 모델 실행 환경과 준비 사항은 프로젝트 README에 설명되어 있습니다.
+
+## 디렉터리
 
 ```text
 django-ai-web-lab/
-├── random-number-generator/   # ModelForm과 랜덤 번호 저장
-├── polling-app/               # Question-Choice 관계와 투표 처리
-├── face-eye-detection/        # OpenCV 이미지 처리
-├── korean-sentiment-analysis/ # KoBERT 모델 로딩과 추론
-├── requirements.txt          # 번호 생성 / 투표 / 이미지 검출 검증 환경
-├── requirements-original.txt # 원본 공통 환경 기록, 완전한 NLP 환경은 아님
-├── .env.example
-└── docs/VERIFICATION.md
+├── random-number-generator/
+│   ├── lotto/                # 번호 생성, 폼, 화면
+│   ├── site_1/               # Django 설정과 URL
+│   └── manage.py
+├── polling-app/
+│   ├── polls/                # 질문, 선택지, 투표
+│   ├── site_2/
+│   └── manage.py
+├── face-eye-detection/
+│   ├── opencv_webapp/        # 업로드와 검출 처리
+│   ├── media/                # Haar Cascade XML
+│   ├── cv_project/
+│   └── manage.py
+├── korean-sentiment-analysis/
+│   ├── main/                 # 토큰화, 모델 로딩, 추론
+│   ├── bert_project/
+│   └── manage.py
+├── requirements.txt
+└── .env.example
 ```
 
-## 실행 환경과 설치
+## 로컬 실행
 
-아래 공통 환경은 Python 3.12.4에서 번호 생성, 투표, 이미지 검출 프로젝트를 검증하기 위한 환경입니다. 원본의 Django 5.1.2를 유지했으며, 서버에서 GUI를 사용하지 않으므로 OpenCV는 headless 4.10.0.84를 사용합니다. 역사적 개발 환경을 기록한 것이며 최신 보안 패치가 적용된 운영 환경을 의미하지 않습니다.
+번호 생성, 투표, 이미지 검출 앱의 공통 환경은 Python 3.12.4, Django 5.1.2, NumPy 1.26.4, OpenCV headless 4.10.0.84, Pillow 10.4.0입니다. 감성 분석에는 별도 ML 의존성과 모델 파일이 필요합니다.
 
 ```bash
 git clone https://github.com/Seoyoung2222/django-ai-web-lab.git
@@ -38,59 +77,37 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 export DJANGO_SECRET_KEY="$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')"
-```
 
-Windows에서는 가상환경을 `.venv\Scripts\activate`로 활성화하고 환경변수도 해당 셸 문법으로 지정합니다. `.env.example`은 참고 파일이며 자동으로 읽히지 않습니다.
-
-```bash
-cd polling-app                 # 실행할 프로젝트 선택
+# 실행할 프로젝트를 선택합니다.
+cd polling-app
 python manage.py migrate
-python manage.py createsuperuser  # 관리자 기능이 필요한 경우
+python manage.py createsuperuser
 python manage.py runserver 8000
 ```
 
-이후 `http://127.0.0.1:8000/polls/`에 접속합니다. 질문이 없으면 `/admin/`에서 질문과 선택지를 등록합니다. 여러 프로젝트를 동시에 열려면 프로젝트마다 8000, 8001 등 서로 다른 포트를 사용하세요.
+Windows에서는 `.venv\Scripts\activate`로 가상환경을 활성화하고 환경변수는 사용 중인 셸 문법에 맞춰 지정합니다. `.env.example`은 설정 예시이며 자동으로 로드되지 않습니다.
 
-**한국어 감성 분석은 추가 모델, 데이터, ML 의존성이 필요합니다.** 공통 requirements만 설치해서 추론까지 완료할 수 없습니다. [별도 준비 및 제약](korean-sentiment-analysis/README.md)을 먼저 확인하세요.
+| 프로젝트 | 기본 접속 경로 | 시작 전 준비 |
+|---|---|---|
+| 번호 생성 | `http://127.0.0.1:8000/lotto/` | migration 실행 |
+| 투표 | `http://127.0.0.1:8000/polls/` | `/admin/`에서 질문과 선택지 등록 |
+| 얼굴과 눈 검출 | `http://127.0.0.1:8000/detect_face/` | 사용 권한이 있는 이미지 준비 |
+| 감성 분석 | `http://127.0.0.1:8000/predict_sentiment/bert_input/` | [모델, 데이터, ML 환경 준비](korean-sentiment-analysis/README.md#실행-준비) |
 
-## 공통 요청 처리 구조
+각 프로젝트에서 migration을 실행하면 독립된 SQLite DB가 생성됩니다. 여러 프로젝트를 동시에 실행할 때는 서로 다른 포트를 지정합니다.
 
-```text
-브라우저 → URL 라우팅 → View → Form / Model / 처리 함수 → Template → 응답
-                                   ↓
-                            프로젝트별 SQLite
-```
+### 환경변수
 
-- 번호 생성: ModelForm 검증 후 모델의 `generate()`에서 숫자와 생성 시각을 저장합니다.
-- 투표: 질문에 속한 Choice를 찾고 득표 수를 증가시킨 후 결과 화면으로 이동합니다.
-- 이미지 검출: ImageField에 파일을 저장한 뒤 OpenCV로 같은 파일에 검출 박스를 그립니다.
-- 감성 분석: 전처리와 토큰화 후 TensorFlow 모델로 부정/긍정 클래스와 softmax 최대값을 계산합니다.
+| 변수 | 용도 | 기본 동작 |
+|---|---|---|
+| `DJANGO_SECRET_KEY` | 세션 등 Django 서명 키 | 미설정 시 프로세스별 임시 키 생성 |
+| `DJANGO_DEBUG` | 개발 모드 | `1` |
+| `DJANGO_ALLOWED_HOSTS` | 쉼표로 구분한 허용 호스트 | localhost, 127.0.0.1, [::1] |
 
-## 안전한 저장소 정리
+지속적인 세션 사용을 위해 SECRET_KEY를 지정해야 합니다. 공개 서버에 배포할 경우 지원되는 최신 의존성, HTTPS, DEBUG 비활성화, 업로드 검증 및 접근 제어를 별도로 구성해야 합니다.
 
-원본 압축파일과 기존 작업 폴더는 변경하지 않았습니다. 새 저장소에 필요한 코드, 템플릿, 정적 파일, 마이그레이션과 Cascade XML만 복사했습니다.
+## 프로젝트 범위
 
-제외한 항목:
-- 가상환경, 설치 패키지, 캐시, macOS 메타데이터
-- SQLite DB와 기존 계정/세션/업로드 내역
-- 업로드된 인물 사진 및 생성된 이미지
-- 약 369 MB의 KoBERT 가중치와 약 20.6 MB의 리뷰 데이터
-- 중복 collectstatic 출력
+웹 개발과 AI 기능 연동을 다루는 학습 프로젝트입니다. 인증 기반 중복 투표 방지, 동시성 제어, 모델 캐싱 등은 구현 범위에 포함하지 않았으며 각 README에 제한 사항을 설명했습니다. 감성 분석의 실제 모델 로딩과 end-to-end 추론은 검증되지 않았습니다.
 
-설정의 고정 Django SECRET_KEY를 제거하고 환경변수 또는 프로세스별 임시 키로 대체했습니다. 키를 지정하지 않으면 서버 재시작 때 세션이 무효화될 수 있습니다. 기존 DB는 커밋하지 않으며 `migrate`로 새 DB를 만듭니다.
-
-## 원본과 달라진 부분
-
-1. 기능별 최상위 폴더 이름 및 README 추가
-2. 가상환경, 실행 데이터와 비밀 설정 분리
-3. 로컬 실행용 DEBUG/ALLOWED_HOSTS 환경변수 설정 추가
-4. 감성 분석 view의 누락된 `bert_load` import 추가
-5. 검증용 공통 의존성 파일과 검증 결과 기록
-
-기능을 확장하거나 완성된 운영 서비스로 재작성하지 않았습니다. 예외 처리, 동시 투표, 중복 투표 방지, 모델 캐싱 등 개선이 필요한 부분은 각 README에 명시했습니다. [검증 결과](docs/VERIFICATION.md)는 수행한 검사와 미수행 항목을 구분합니다.
-
-## 운영 및 라이선스 주의
-
-로컬 학습/포트폴리오용 코드입니다. 공개 서버에서는 최신 지원 버전 검토, HTTPS, 비밀키 관리, DEBUG 비활성화, 허용 호스트, 업로드 검증과 접근 통제를 별도로 갖춰야 합니다. 번호 생성 기능은 무작위 샘플링 예제이며 예측 능력이나 당첨 가능성 향상을 제공하지 않습니다.
-
-`bert_tokenizer.py`의 Apache 2.0 고지와 OpenCV Cascade XML의 원저작권 고지를 유지했습니다. 원본 데이터, 이미지, 모델의 재배포 권한은 별도 확인이 필요하므로 리뷰 데이터와 가중치는 저장소에 포함하지 않았습니다. 저장소 전체에 임의의 오픈소스 라이선스를 부여하지 않았습니다.
+KoBERT 가중치와 리뷰 데이터는 저장소에 포함되어 있지 않습니다. 모델과 데이터 사용 시 각각의 이용 조건을 확인해야 합니다. `bert_tokenizer.py`와 OpenCV Cascade XML에는 해당 구성 요소의 라이선스 고지가 포함되어 있습니다.
