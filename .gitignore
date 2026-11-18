@@ -1,0 +1,23 @@
+# Local environments and secrets
+.venv/
+venv/
+django_env/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.DS_Store
+__MACOSX/
+*.sqlite3
+*.sqlite3-journal
+# Generated assets and local model/data files
+**/media/images/
+**/media/*.jpg
+**/media/*.png
+**/staticfiles/
+*.h5
+*.hdf5
+*.pt
+*.pth
+**/data/*.txt

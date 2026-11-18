@@ -1,0 +1,6 @@
+# Verified for the three non-NLP apps with Python 3.12.4.
+# Historical development baseline, not a production security recommendation.
+Django==5.1.2
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+Pillow==10.4.0
